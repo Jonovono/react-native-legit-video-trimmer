@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="16097.2" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="16087"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="LegitVideoTrimmerViewController" customModule="VideoTrimmer" customModuleProvider="target">
+            <connections>
+                <outlet property="playerView" destination="pT9-hO-QQC" id="QNM-a7-Jd6"/>
+                <outlet property="trimmerView" destination="DQ1-98-Kgg" id="ktt-pz-RCf"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pT9-hO-QQC">
+                    <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DQ1-98-Kgg" customClass="TrimmerView" customModule="PryntTrimmerView">
+                    <rect key="frame" x="30" y="806" width="354" height="56"/>
+                    <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="56" id="fIs-9r-Mdm"/>
+                    </constraints>
+                </view>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Jvn-sA-ifk">
+                    <rect key="frame" x="30" y="44" width="34" height="30"/>
+                    <state key="normal" title="Back"/>
+                    <connections>
+                        <action selector="backButtonAction:" destination="-1" eventType="touchUpInside" id="Tg6-Nk-fN6"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" systemColor="systemBackgroundColor" cocoaTouchSystemColor="whiteColor"/>
+            <constraints>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="trailing" secondItem="DQ1-98-Kgg" secondAttribute="trailing" constant="30" id="7On-kF-pVO"/>
+                <constraint firstItem="pT9-hO-QQC" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" id="Ei1-KW-4nA"/>
+                <constraint firstItem="pT9-hO-QQC" firstAttribute="trailing" secondItem="fnl-2z-Ty3" secondAttribute="trailing" id="LEE-Tk-lNu"/>
+                <constraint firstItem="pT9-hO-QQC" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="MLg-dL-4p1"/>
+                <constraint firstItem="Jvn-sA-ifk" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="30" id="dvt-f7-9f8"/>
+                <constraint firstAttribute="bottom" secondItem="pT9-hO-QQC" secondAttribute="bottom" id="ihr-Am-aFu"/>
+                <constraint firstItem="Jvn-sA-ifk" firstAttribute="top" secondItem="fnl-2z-Ty3" secondAttribute="top" id="kNF-ke-74b"/>
+                <constraint firstItem="DQ1-98-Kgg" firstAttribute="leading" secondItem="fnl-2z-Ty3" secondAttribute="leading" constant="30" id="qab-Fj-fvk"/>
+                <constraint firstItem="fnl-2z-Ty3" firstAttribute="bottom" secondItem="DQ1-98-Kgg" secondAttribute="bottom" id="ugR-1f-6St"/>
+            </constraints>
+            <viewLayoutGuide key="safeArea" id="fnl-2z-Ty3"/>
+            <point key="canvasLocation" x="137.68115942028987" y="152.67857142857142"/>
+        </view>
+    </objects>
+</document>
