@@ -1,5 +1,5 @@
 //
-//  LegitVideoTrimmerViewController.swift
+//  LegitVideoTrimmerView.swift
 //  VideoTrimmer
 //
 //  Created by Andrii Novoselskyi on 27.08.2020.
@@ -10,13 +10,31 @@ import UIKit
 import AVFoundation
 import MobileCoreServices
 import PryntTrimmerView
+import Photos
 
-class LegitVideoTrimmerViewController: UIViewController {
+@objc(LegitVideoTrimmerView)
+class LegitVideoTrimmerView: UIView {
     
-    @IBOutlet weak var playerView: UIView!
-    @IBOutlet weak var trimmerView: TrimmerView!
+    @objc var source: NSString = "" {
+        didSet {
+            print("source: \(source)")
+        }
+    }
     
-    var asset: AVAsset? {
+    @objc var minDuration: NSNumber = 0 {
+        didSet {
+        }
+    }
+    
+    @objc var maxDuration: NSNumber = 0 {
+        didSet {
+        }
+    }
+
+    private var playerView: UIView!
+    private var trimmerView: TrimmerView!
+    
+    private var asset: AVAsset? {
         didSet {
             trimmerView.asset = asset
             if let asset = asset {
@@ -25,25 +43,75 @@ class LegitVideoTrimmerViewController: UIViewController {
         }
     }
     
-    @IBAction func backButtonAction(_ sender: Any) {
-        guard let asset = player?.currentItem?.asset else { return }
-        cropVideo(asset: asset, startTime: trimmerView.startTime!.seconds, endTime: trimmerView.endTime!.seconds) { url in
-            print("Result url: \(url)")
-        }
-    }
+//    @IBAction func backButtonAction(_ sender: Any) {
+//        guard let asset = player?.currentItem?.asset else { return }
+//        cropVideo(asset: asset, startTime: trimmerView.startTime!.seconds, endTime: trimmerView.endTime!.seconds) { url in
+//            print("Result url: \(url)")
+//        }
+//    }
     
-    var player: AVPlayer?
-    var playbackTimeCheckerTimer: Timer?
-    var trimmerPositionChangedTimer: Timer?
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
+    private var player: AVPlayer?
+    private var playbackTimeCheckerTimer: Timer?
+    private var trimmerPositionChangedTimer: Timer?
+    
+    init() {
+        super.init(frame: .zero)
+        playerView = UIView()
+        trimmerView = TrimmerView()
+        addSubview(playerView)
+        addSubview(trimmerView)
+        
+        backgroundColor = .red
+        
+        playerView.translatesAutoresizingMaskIntoConstraints = false
+        trimmerView.translatesAutoresizingMaskIntoConstraints = false
+        
+        playerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
+        playerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        playerView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
+        playerView.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
+        playerView.backgroundColor = .green
+        
+        if #available(iOS 11.0, *) {
+            trimmerView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor).isActive = true
+        } else {
+            trimmerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        }
+        trimmerView.leftAnchor.constraint(equalTo: leftAnchor, constant: 30).isActive = true
+        trimmerView.rightAnchor.constraint(equalTo: rightAnchor, constant: -30).isActive = true
+        trimmerView.heightAnchor.constraint(equalToConstant: 56).isActive = true
+        trimmerView.backgroundColor = .orange
         
         setupTrimmerView()
+        
+        loadAssetRandomly()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func loadAssetRandomly() {
+        
+        PHPhotoLibrary.requestAuthorization { (status) in
+            if status == .authorized {
+                let fetchResult = PHAsset.fetchAssets(with: .video, options: nil)
+                
+                let randomAssetIndex = Int(arc4random_uniform(UInt32(fetchResult.count - 1)))
+                let asset = fetchResult.object(at: randomAssetIndex)
+                PHCachingImageManager().requestAVAsset(forVideo: asset, options: nil) { (avAsset, _, _) in
+                    DispatchQueue.main.async {
+                        if let avAsset = avAsset {
+                            self.asset = avAsset
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
-extension LegitVideoTrimmerViewController {
+extension LegitVideoTrimmerView {
     
     private func setupTrimmerView() {
         trimmerView.handleColor = UIColor.white
@@ -52,11 +120,11 @@ extension LegitVideoTrimmerViewController {
     }
 }
 
-extension LegitVideoTrimmerViewController {
+extension LegitVideoTrimmerView {
     
     private func startPlaybackTimeChecker() {
         stopPlaybackTimeChecker()
-        playbackTimeCheckerTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(LegitVideoTrimmerViewController.onPlaybackTimeChecker), userInfo: nil, repeats: true)
+        playbackTimeCheckerTimer = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(LegitVideoTrimmerView.onPlaybackTimeChecker), userInfo: nil, repeats: true)
     }
 
     private func stopPlaybackTimeChecker() {
@@ -79,7 +147,7 @@ extension LegitVideoTrimmerViewController {
         let playerItem = AVPlayerItem(asset: asset)
         player = AVPlayer(playerItem: playerItem)
 
-        NotificationCenter.default.addObserver(self, selector: #selector(LegitVideoTrimmerViewController.itemDidFinishPlaying(_:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: playerItem)
+        NotificationCenter.default.addObserver(self, selector: #selector(LegitVideoTrimmerView.itemDidFinishPlaying(_:)), name: NSNotification.Name.AVPlayerItemDidPlayToEndTime, object: playerItem)
 
         let layer: AVPlayerLayer = AVPlayerLayer(player: player)
         layer.backgroundColor = UIColor.white.cgColor
@@ -114,7 +182,7 @@ extension LegitVideoTrimmerViewController {
     }
 }
 
-extension LegitVideoTrimmerViewController: TrimmerViewDelegate {
+extension LegitVideoTrimmerView: TrimmerViewDelegate {
     
     func positionBarStoppedMoving(_ playerTime: CMTime) {
         player?.seek(to: playerTime, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
@@ -138,7 +206,7 @@ extension AVPlayer {
     }
 }
 
-extension LegitVideoTrimmerViewController {
+extension LegitVideoTrimmerView {
     
     func cropVideo(asset: AVAsset, startTime: Double, endTime: Double, completion: ((_ outputUrl: URL) -> Void)? = nil) {
         let fileManager = FileManager.default

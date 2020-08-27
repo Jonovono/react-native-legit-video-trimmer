@@ -1,6 +1,8 @@
 import * as React from 'react';
-import { StyleSheet, View, Text } from 'react-native';
+import { StyleSheet, View, Text, requireNativeComponent } from 'react-native';
 import LegitVideoTrimmer from 'react-native-legit-video-trimmer';
+
+const VideoTrimmerView = requireNativeComponent("VideoTrimmerView");
 
 export default function App() {
   const [result, setResult] = React.useState<number | undefined>();
@@ -11,15 +13,16 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      <VideoTrimmerView 
+        style={styles.container}
+        source={'video url'}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    flex: 1, alignItems: "stretch"
   },
 });
