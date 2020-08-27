@@ -15,7 +15,7 @@ export default function App() {
     <View style={styles.container}>
       <VideoTrimmerView 
         style={styles.container}
-        source={'video url'}
+        source={'test_video.mov'}
       />
     </View>
   );

@@ -18,6 +18,7 @@ class LegitVideoTrimmerView: UIView {
     @objc var source: NSString = "" {
         didSet {
             print("source: \(source)")
+            loadAsset(for: source as String)
         }
     }
     
@@ -84,7 +85,11 @@ class LegitVideoTrimmerView: UIView {
         
         setupTrimmerView()
         
-        loadAssetRandomly()
+//        loadAssetRandomly()
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.loadAsset(for: self.source as String)
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -117,6 +122,17 @@ extension LegitVideoTrimmerView {
         trimmerView.handleColor = UIColor.white
         trimmerView.mainColor = UIColor.darkGray
         trimmerView.delegate = self
+    }
+    
+    private func loadAsset(for source: String) {
+        if let url = URL(string: source), (url.isFileURL || source.hasPrefix("http")) {
+            asset = AVAsset(url: url)
+        } else {
+            let sourceComponents = source.components(separatedBy: ".")
+            if let url = Bundle.main.url(forResource: sourceComponents.first, withExtension: sourceComponents.last) {
+                asset = AVAsset(url: url)
+            }
+        }
     }
 }
 
