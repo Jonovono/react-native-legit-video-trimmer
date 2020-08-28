@@ -9,7 +9,7 @@ import AVFoundation
 
 class LegitVideoTrimmerService {
     
-    func trimVideo(asset: AVAsset, startTime: Double, endTime: Double, completion: ((_ outputUrl: URL) -> Void)? = nil) {
+    func trimVideo(asset: AVAsset, startTime: Double, endTime: Double, completion: ((_ outputUrl: URL?) -> Void)? = nil) {
         let fileManager = FileManager.default
         let documentDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask)[0]
 
@@ -48,8 +48,10 @@ class LegitVideoTrimmerService {
                 completion?(outputURL)
             case .failed:
                 print("failed \(exportSession.error.debugDescription)")
+                completion?(nil)
             case .cancelled:
                 print("cancelled \(exportSession.error.debugDescription)")
+                completion?(nil)
             default: break
             }
         }

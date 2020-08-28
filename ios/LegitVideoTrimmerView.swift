@@ -193,11 +193,10 @@ class LegitVideoTrimmerView: UIView {
         videoTrimmerService.trimVideo(asset: asset, startTime: trimmerView.startTime!.seconds, endTime: trimmerView.endTime!.seconds) { [weak self] url in
             DispatchQueue.main.async {
                 guard let self = self else { return }
-                print("Result url: \(url)")
                 self.onSelectedTrim?([
                     "startTime": self.trimmerView.startTime!.seconds,
                     "endTime": self.trimmerView.endTime!.seconds,
-                    "filePath": url.relativePath
+                    "filePath": url?.relativePath ?? ""
                 ])
                 self.isTrimming = false
             }
