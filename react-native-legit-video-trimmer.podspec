@@ -18,5 +18,6 @@ Pod::Spec.new do |s|
   
 
   s.dependency "React"
-  s.dependency "PryntTrimmerView"
+  # s.dependency "PryntTrimmerView"
+
 end

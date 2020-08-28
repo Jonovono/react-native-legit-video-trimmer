@@ -9,7 +9,6 @@
 import UIKit
 import AVFoundation
 import MobileCoreServices
-import PryntTrimmerView
 import Photos
 
 @objc(LegitVideoTrimmerView)
