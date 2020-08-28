@@ -5,11 +5,6 @@ import LegitVideoTrimmer from 'react-native-legit-video-trimmer';
 const VideoTrimmerView = requireNativeComponent("VideoTrimmerView");
 
 export default function App() {
-  const [result, setResult] = React.useState<number | undefined>();
-
-  React.useEffect(() => {
-    LegitVideoTrimmer.multiply(3, 7).then(setResult);
-  }, []);
 
   selectedTrim = e => {
     console.log("event onSelectedTrim", e.nativeEvent.startTime);
