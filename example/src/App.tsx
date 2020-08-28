@@ -11,6 +11,15 @@ export default function App() {
     LegitVideoTrimmer.multiply(3, 7).then(setResult);
   }, []);
 
+  selectedTrim = e => {
+    console.log("event onSelectedTrim", e.nativeEvent.startTime);
+    console.log("event endTime", e.nativeEvent.endTime);
+    console.log("event filePath", e.nativeEvent.filePath);
+  }
+  onCancel = e => {
+    console.log("event onCancel");
+  }
+
   return (
     <View style={styles.container}>
       <VideoTrimmerView 
@@ -22,6 +31,8 @@ export default function App() {
         handleColor={'#FFFFFF'}
         positionBarColor={'#FFFFFF'}
         doneButtonBackgroundColor={'#555555'}
+        onSelectedTrim={this.selectedTrim}
+        onCancel={this.onCancel}
       />
     </View>
   );

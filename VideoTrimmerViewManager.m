@@ -16,5 +16,7 @@ RCT_EXPORT_VIEW_PROPERTY(mainColor, NSString)
 RCT_EXPORT_VIEW_PROPERTY(handleColor, NSString)
 RCT_EXPORT_VIEW_PROPERTY(positionBarColor, NSString)
 RCT_EXPORT_VIEW_PROPERTY(doneButtonBackgroundColor, NSString)
+RCT_EXPORT_VIEW_PROPERTY(onSelectedTrim, RCTDirectEventBlock)
+RCT_EXPORT_VIEW_PROPERTY(onCancel, RCTDirectEventBlock)
 
 @end

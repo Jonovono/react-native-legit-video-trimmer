@@ -79,6 +79,10 @@ class LegitVideoTrimmerView: UIView {
             }
         }
     }
+    
+    @objc var onSelectedTrim: RCTDirectEventBlock?
+    
+    @objc var onCancel: RCTDirectEventBlock?
 
     private var playerView: UIView!
     private var backButton: UIButton!
@@ -102,6 +106,8 @@ class LegitVideoTrimmerView: UIView {
     private var trimmerPositionChangedTimer: Timer?
     
     private var videoTrimmerService = LegitVideoTrimmerService()
+    
+    private var isTrimming: Bool = false
     
     init() {
         super.init(frame: .zero)
@@ -177,13 +183,24 @@ class LegitVideoTrimmerView: UIView {
     
     @objc
     private func backButtonDidPress(button: UIButton) {
+        onCancel?([:])
     }
     
     @objc
     private func doneButtonDidPress(button: UIButton) {
-        guard let asset = asset else { return }
-        videoTrimmerService.trimVideo(asset: asset, startTime: trimmerView.startTime!.seconds, endTime: trimmerView.endTime!.seconds) { url in
-            print("Result url: \(url)")
+        guard let asset = asset, !isTrimming else { return }
+        isTrimming = true
+        videoTrimmerService.trimVideo(asset: asset, startTime: trimmerView.startTime!.seconds, endTime: trimmerView.endTime!.seconds) { [weak self] url in
+            DispatchQueue.main.async {
+                guard let self = self else { return }
+                print("Result url: \(url)")
+                self.onSelectedTrim?([
+                    "startTime": self.trimmerView.startTime!.seconds,
+                    "endTime": self.trimmerView.endTime!.seconds,
+                    "filePath": url.relativePath
+                ])
+                self.isTrimming = false
+            }
         }
     }
 }
