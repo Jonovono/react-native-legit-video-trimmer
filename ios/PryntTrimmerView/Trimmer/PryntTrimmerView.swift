@@ -187,16 +187,16 @@ public protocol TrimmerViewDelegate: class {
 
     private func setupPositionBar() {
 
-        positionBar.frame = CGRect(x: 0, y: 0, width: 3, height: frame.height)
+        positionBar.frame = CGRect(x: 0, y: 0, width: 6, height: frame.height)
         positionBar.backgroundColor = positionBarColor
         positionBar.center = CGPoint(x: leftHandleView.frame.maxX, y: center.y)
-        positionBar.layer.cornerRadius = 1
+        positionBar.layer.cornerRadius = 3
         positionBar.translatesAutoresizingMaskIntoConstraints = false
         positionBar.isUserInteractionEnabled = true
         addSubview(positionBar)
 
         positionBar.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        positionBar.widthAnchor.constraint(equalToConstant: 3).isActive = true
+        positionBar.widthAnchor.constraint(equalToConstant: 6).isActive = true
         positionBar.heightAnchor.constraint(equalTo: heightAnchor).isActive = true
         positionConstraint = positionBar.leftAnchor.constraint(equalTo: leftHandleView.rightAnchor, constant: 0)
         positionConstraint?.isActive = true
