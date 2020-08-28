@@ -11,7 +11,7 @@ class LegitVideoTrimmerService {
     
     func trimVideo(asset: AVAsset, startTime: Double, endTime: Double, completion: ((_ outputUrl: URL) -> Void)? = nil) {
         let fileManager = FileManager.default
-        let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
+        let documentDirectory = fileManager.urls(for: .cachesDirectory, in: .userDomainMask)[0]
 
         let length = Float(asset.duration.value) / Float(asset.duration.timescale)
         print("video length: \(length) seconds")
@@ -20,11 +20,13 @@ class LegitVideoTrimmerService {
         formatter.dateFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'Z'"
         let date = Date()
 
-        var outputURL = documentDirectory.appendingPathComponent("output")
+        var outputURL = documentDirectory
+            .appendingPathComponent("LegitVideoTrimmer")
+            .appendingPathComponent("Output")
         do {
             try fileManager.createDirectory(at: outputURL, withIntermediateDirectories: true, attributes: nil)
             outputURL = outputURL.appendingPathComponent("\(formatter.string(from: date)).mp4")
-        }catch let error {
+        } catch let error {
             print(error)
         }
 
