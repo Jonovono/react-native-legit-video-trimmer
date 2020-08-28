@@ -21,6 +21,7 @@ export default function App() {
         mainColor={'#555555'}
         handleColor={'#FFFFFF'}
         positionBarColor={'#FFFFFF'}
+        doneButtonBackgroundColor={'#555555'}
       />
     </View>
   );

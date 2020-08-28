@@ -17,6 +17,7 @@ class LegitVideoTrimmerView: UIView {
     
     private let kMinDuration: Double = 1
     private let kMaxDuration: Double = 10 * 60
+    private let kSelectedDurationFormat = "%.1fs selected"
     
     @objc var source: NSString = "" {
         didSet {
@@ -70,26 +71,32 @@ class LegitVideoTrimmerView: UIView {
             }
         }
     }
+    
+    @objc var doneButtonBackgroundColor: NSString = "" {
+        didSet {
+            if let color = UIColor(string: doneButtonBackgroundColor as String) {
+                doneButton.backgroundColor = color
+            }
+        }
+    }
 
     private var playerView: UIView!
+    private var backButton: UIButton!
+    private var selectedDurationLabel: UILabel!
+    private var doneButton: UIButton!
     private var trimmerView: TrimmerView!
     
     private var asset: AVAsset? {
         didSet {
             trimmerView.asset = asset
+            let duration = (trimmerView.endTime! - trimmerView.startTime!).seconds
+            selectedDurationLabel.text = String(format: kSelectedDurationFormat, duration)
             if let asset = asset {
                 addVideoPlayer(with: asset, playerView: playerView)
             }
         }
     }
-    
-//    @IBAction func backButtonAction(_ sender: Any) {
-//        guard let asset = player?.currentItem?.asset else { return }
-//        cropVideo(asset: asset, startTime: trimmerView.startTime!.seconds, endTime: trimmerView.endTime!.seconds) { url in
-//            print("Result url: \(url)")
-//        }
-//    }
-    
+        
     private var player: AVPlayer?
     private var playbackTimeCheckerTimer: Timer?
     private var trimmerPositionChangedTimer: Timer?
@@ -98,24 +105,53 @@ class LegitVideoTrimmerView: UIView {
         super.init(frame: .zero)
         
         playerView = UIView()
-        trimmerView = TrimmerView()
-        
-        addSubview(playerView)
-        addSubview(trimmerView)
-                
         playerView.translatesAutoresizingMaskIntoConstraints = false
-        trimmerView.translatesAutoresizingMaskIntoConstraints = false
-        
+        addSubview(playerView)
         playerView.topAnchor.constraint(equalTo: topAnchor).isActive = true
         playerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         playerView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
         playerView.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
         
+        backButton = UIButton(type: .system)
+        backButton.setTitle("Back", for: .normal)
+        backButton.tintColor = .white
+        backButton.addTarget(self, action: #selector(backButtonDidPress(button:)), for: .touchUpInside)
+        backButton.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(backButton)
         if #available(iOS 11.0, *) {
-            trimmerView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor).isActive = true
+            backButton.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor).isActive = true
         } else {
-            trimmerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+            backButton.topAnchor.constraint(equalTo: topAnchor).isActive = true
         }
+        backButton.leftAnchor.constraint(equalTo: leftAnchor, constant: 15).isActive = true
+                
+        doneButton = UIButton(type: .system)
+        doneButton.setTitle("DONE", for: .normal)
+        doneButton.contentEdgeInsets = .init(top: 10, left: 10, bottom: 10, right: 10)
+        doneButton.layer.cornerRadius = 5
+        doneButton.tintColor = .white
+        doneButton.addTarget(self, action: #selector(doneButtonDidPress(button:)), for: .touchUpInside)
+        doneButton.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(doneButton)
+        if #available(iOS 11.0, *) {
+            doneButton.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor).isActive = true
+        } else {
+            doneButton.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        }
+        doneButton.rightAnchor.constraint(equalTo: rightAnchor, constant: -30).isActive = true
+        
+        selectedDurationLabel = UILabel()
+        selectedDurationLabel.font = .systemFont(ofSize: 12, weight: .medium)
+        selectedDurationLabel.textColor = .white
+        selectedDurationLabel.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(selectedDurationLabel)
+        selectedDurationLabel.centerYAnchor.constraint(equalTo: doneButton.centerYAnchor).isActive = true
+        selectedDurationLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 30).isActive = true
+
+        trimmerView = TrimmerView()
+        trimmerView.translatesAutoresizingMaskIntoConstraints = false
+        addSubview(trimmerView)
+        trimmerView.bottomAnchor.constraint(equalTo: doneButton.topAnchor, constant: -20).isActive = true
         trimmerView.leftAnchor.constraint(equalTo: leftAnchor, constant: 30).isActive = true
         trimmerView.rightAnchor.constraint(equalTo: rightAnchor, constant: -30).isActive = true
         trimmerView.heightAnchor.constraint(equalToConstant: 56).isActive = true
@@ -137,22 +173,15 @@ class LegitVideoTrimmerView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    private func loadAssetRandomly() {
-        
-        PHPhotoLibrary.requestAuthorization { (status) in
-            if status == .authorized {
-                let fetchResult = PHAsset.fetchAssets(with: .video, options: nil)
-                
-                let randomAssetIndex = Int(arc4random_uniform(UInt32(fetchResult.count - 1)))
-                let asset = fetchResult.object(at: randomAssetIndex)
-                PHCachingImageManager().requestAVAsset(forVideo: asset, options: nil) { (avAsset, _, _) in
-                    DispatchQueue.main.async {
-                        if let avAsset = avAsset {
-                            self.asset = avAsset
-                        }
-                    }
-                }
-            }
+    @objc
+    private func backButtonDidPress(button: UIButton) {
+    }
+    
+    @objc
+    private func doneButtonDidPress(button: UIButton) {
+        guard let asset = asset else { return }
+        trimVideo(asset: asset, startTime: trimmerView.startTime!.seconds, endTime: trimmerView.endTime!.seconds) { url in
+            print("Result url: \(url)")
         }
     }
 }
@@ -252,13 +281,13 @@ extension LegitVideoTrimmerView: TrimmerViewDelegate {
         player?.pause()
         player?.seek(to: playerTime, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
         let duration = (trimmerView.endTime! - trimmerView.startTime!).seconds
-        print(duration)
+        selectedDurationLabel.text = String(format: kSelectedDurationFormat, duration)
     }
 }
 
 extension LegitVideoTrimmerView {
     
-    func cropVideo(asset: AVAsset, startTime: Double, endTime: Double, completion: ((_ outputUrl: URL) -> Void)? = nil) {
+    func trimVideo(asset: AVAsset, startTime: Double, endTime: Double, completion: ((_ outputUrl: URL) -> Void)? = nil) {
         let fileManager = FileManager.default
         let documentDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask)[0]
 
