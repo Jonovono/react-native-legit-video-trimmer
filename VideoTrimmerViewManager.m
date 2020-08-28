@@ -12,5 +12,8 @@
 RCT_EXPORT_VIEW_PROPERTY(source, NSString)
 RCT_EXPORT_VIEW_PROPERTY(minDuration, NSNumber)
 RCT_EXPORT_VIEW_PROPERTY(maxDuration, NSNumber)
+RCT_EXPORT_VIEW_PROPERTY(mainColor, NSString)
+RCT_EXPORT_VIEW_PROPERTY(handleColor, NSString)
+RCT_EXPORT_VIEW_PROPERTY(positionBarColor, NSString)
 
 @end

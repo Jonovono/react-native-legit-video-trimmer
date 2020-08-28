@@ -16,6 +16,11 @@ export default function App() {
       <VideoTrimmerView 
         style={styles.container}
         source={'test_video.mov'}
+        minDuration={2}
+        maxDuration={20}
+        mainColor={'#555555'}
+        handleColor={'#FFFFFF'}
+        positionBarColor={'#FFFFFF'}
       />
     </View>
   );

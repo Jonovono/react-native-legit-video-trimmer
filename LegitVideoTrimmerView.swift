@@ -15,20 +15,59 @@ import Photos
 @objc(LegitVideoTrimmerView)
 class LegitVideoTrimmerView: UIView {
     
+    private let kMinDuration: Double = 1
+    private let kMaxDuration: Double = 10 * 60
+    
     @objc var source: NSString = "" {
         didSet {
             print("source: \(source)")
-            loadAsset(for: source as String)
+            if asset != nil {
+                loadAsset(for: source as String)
+            }
         }
     }
     
     @objc var minDuration: NSNumber = 0 {
         didSet {
+            if minDuration.doubleValue < kMinDuration {
+                minDuration = NSNumber(value: kMinDuration)
+            }
+            
+            trimmerView.minDuration = minDuration.doubleValue
         }
     }
     
     @objc var maxDuration: NSNumber = 0 {
         didSet {
+            if maxDuration.doubleValue > kMaxDuration {
+                maxDuration = NSNumber(value: kMaxDuration)
+            }
+            
+            trimmerView.maxDuration = maxDuration.doubleValue
+        }
+    }
+    
+    @objc var mainColor: NSString = "" {
+        didSet {
+            if let color = UIColor(string: mainColor as String) {
+                trimmerView.mainColor = color
+            }
+        }
+    }
+    
+    @objc var handleColor: NSString = "" {
+        didSet {
+            if let color = UIColor(string: handleColor as String) {
+                trimmerView.handleColor = color
+            }
+        }
+    }
+
+    @objc var positionBarColor: NSString = "" {
+        didSet {
+            if let color = UIColor(string: positionBarColor as String) {
+                trimmerView.positionBarColor = color
+            }
         }
     }
 
@@ -57,13 +96,13 @@ class LegitVideoTrimmerView: UIView {
     
     init() {
         super.init(frame: .zero)
+        
         playerView = UIView()
         trimmerView = TrimmerView()
+        
         addSubview(playerView)
         addSubview(trimmerView)
-        
-        backgroundColor = .red
-        
+                
         playerView.translatesAutoresizingMaskIntoConstraints = false
         trimmerView.translatesAutoresizingMaskIntoConstraints = false
         
@@ -71,7 +110,6 @@ class LegitVideoTrimmerView: UIView {
         playerView.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         playerView.leftAnchor.constraint(equalTo: leftAnchor).isActive = true
         playerView.rightAnchor.constraint(equalTo: rightAnchor).isActive = true
-        playerView.backgroundColor = .green
         
         if #available(iOS 11.0, *) {
             trimmerView.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor).isActive = true
@@ -81,14 +119,17 @@ class LegitVideoTrimmerView: UIView {
         trimmerView.leftAnchor.constraint(equalTo: leftAnchor, constant: 30).isActive = true
         trimmerView.rightAnchor.constraint(equalTo: rightAnchor, constant: -30).isActive = true
         trimmerView.heightAnchor.constraint(equalToConstant: 56).isActive = true
-        trimmerView.backgroundColor = .orange
         
-        setupTrimmerView()
+        setupTrimmerView()        
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
         
-//        loadAssetRandomly()
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.loadAsset(for: self.source as String)
+        if asset == nil {
+            DispatchQueue.main.async {
+                self.loadAsset(for: self.source as String)
+            }
         }
     }
     
@@ -212,13 +253,6 @@ extension LegitVideoTrimmerView: TrimmerViewDelegate {
         player?.seek(to: playerTime, toleranceBefore: CMTime.zero, toleranceAfter: CMTime.zero)
         let duration = (trimmerView.endTime! - trimmerView.startTime!).seconds
         print(duration)
-    }
-}
-
-extension AVPlayer {
-
-    var isPlaying: Bool {
-        return self.rate != 0 && self.error == nil
     }
 }
 
