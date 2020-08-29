@@ -175,6 +175,12 @@ class LegitVideoTrimmerView: UIView {
             }
         }
     }
+
+    override func removeFromSuperview() {
+        super.removeFromSuperview()
+        guard let player = player else { return }
+        player.pause()
+    }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
